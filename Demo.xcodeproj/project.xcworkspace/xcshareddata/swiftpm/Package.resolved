@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "repo-admission-gate-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/rajatslakhina/repo-admission-gate-kit.git",
+      "state" : {
+        "revision" : "8025133577ff82baec6e7ac9a98a3fe4427d53e6",
+        "version" : "2.0.0"
+      }
+    }
+  ],
+  "version" : 2
+}
