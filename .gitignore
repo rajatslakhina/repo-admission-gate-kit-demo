@@ -1,0 +1,10 @@
+.DS_Store
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcworkspace/xcuserdata/
+Demo.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Package.resolved is deliberately NOT ignored: it is the only thing in this
+# repository that records which library revision a clone actually gets.
