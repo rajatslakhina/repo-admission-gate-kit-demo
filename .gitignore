@@ -6,5 +6,6 @@ xcuserdata/
 *.xcworkspace/xcuserdata/
 Demo.xcodeproj/project.xcworkspace/xcuserdata/
 
-# Package.resolved is deliberately NOT ignored: it is the only thing in this
-# repository that records which library revision a clone actually gets.
+# Package.resolved (Demo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/)
+# is deliberately NOT ignored: it locks the exact library revision a clone
+# gets, and CI builds with -disableAutomaticPackageResolution to enforce it.
