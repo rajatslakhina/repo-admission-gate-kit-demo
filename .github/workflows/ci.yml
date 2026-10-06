@@ -22,15 +22,18 @@ jobs:
         run: xcodebuild -version
 
       # This is the load-bearing step. It proves the remote Swift Package
-      # reference genuinely resolves from GitHub at the pinned tag — not from a
-      # local path, not from whatever `main` happens to be today.
+      # reference genuinely resolves from GitHub at the revision the committed
+      # Package.resolved locks — not from a local path, not from whatever
+      # `main` happens to be today.
       - name: Resolve remote package dependency
-        run: xcodebuild -resolvePackageDependencies -project Demo.xcodeproj -scheme Demo
+        # -disableAutomaticPackageResolution: resolve exactly what the committed
+        # Package.resolved records, and FAIL if the project's requirement no
+        # longer agrees with it — instead of silently floating to a new commit.
+        run: xcodebuild -resolvePackageDependencies -project Demo.xcodeproj -scheme Demo -disableAutomaticPackageResolution
 
       - name: Show resolved version
         run: |
-          cat Demo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved || \
-          echo "No Package.resolved produced"
+          cat Demo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
 
       # `generic/platform=iOS Simulator` deliberately, never `name=iPhone 16`.
       # Pinning to a named device ties the job to whichever simulator *runtimes*
@@ -51,4 +54,5 @@ jobs:
             -scheme Demo \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
+            -disableAutomaticPackageResolution \
             CODE_SIGNING_ALLOWED=NO
