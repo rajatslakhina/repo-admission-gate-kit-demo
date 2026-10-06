@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Resolve package + build for iOS Simulator
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      # This is the load-bearing step. It proves the remote Swift Package
+      # reference genuinely resolves from GitHub at the pinned tag — not from a
+      # local path, not from whatever `main` happens to be today.
+      - name: Resolve remote package dependency
+        run: xcodebuild -resolvePackageDependencies -project Demo.xcodeproj -scheme Demo
+
+      - name: Show resolved version
+        run: |
+          cat Demo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved || \
+          echo "No Package.resolved produced"
+
+      # `generic/platform=iOS Simulator` deliberately, never `name=iPhone 16`.
+      # Pinning to a named device ties the job to whichever simulator *runtimes*
+      # happen to be installed on that day's runner image, and those are not
+      # guaranteed — a job pinned that way fails with "Unable to find a device
+      # matching the provided destination specifier" on a runner image refresh,
+      # even on a commit that changed only a README. A compile-only check needs
+      # no device to exist, so it should not ask for one.
+      #
+      # No `| xcpretty` either: the default shell has no pipefail, so xcpretty's
+      # exit code (always 0) would mask a failed build.
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Demo.xcodeproj \
+            -scheme Demo \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO
